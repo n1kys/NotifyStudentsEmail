@@ -11,7 +11,7 @@
         Title="Notify Students" Height="450" Width="668">
     <TabControl>
         <TabItem x:Name="Main_Tab" Header="Main Tab" Height="22" Margin="0,0,0,0" VerticalAlignment="Top" Background="DarkMagenta">
-            <Grid Background="DarkMagenta">
+            <Grid Background="DarkMagenta" >
                 <ListView x:Name="listBox" Margin="10,10,510,265">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -23,8 +23,8 @@
                 <TreeView x:Name="TreeOfStudents" Margin="169,10,10,265" >
 
                 </TreeView>
-                <TextBox TextWrapping="Wrap" Text="" Margin="10,140,10,54"/>
-                <Button Content="Send message" Margin="10,339,10,10" Background="Aqua"/>
+                <TextBox x:Name="NotifyMessageBox" TextWrapping="Wrap" Margin="10,140,10,54"/>
+                <Button x:Name="SendCommand" Content="Send message" FontSize="16" Margin="10,339,10,10" Background="Aqua" Click="SendCommand_Click"/>
             </Grid>
         </TabItem>
         <TabItem x:Name="Edit_list" Header="Edit list" Background="DarkMagenta">

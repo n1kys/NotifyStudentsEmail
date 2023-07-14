@@ -24,6 +24,7 @@ namespace NotifyStudents
 
         private List<Group> groups = new List<Group>(); // Список групп
         private List<Student> allStudents = new List<Student>(); // Список всех студентов
+        private string SenderMessage { get; set; } 
 
         public MainWindow()
         {
@@ -283,12 +284,105 @@ namespace NotifyStudents
 
         private void AddGroup_Click(object sender, RoutedEventArgs e)
         {
+            AddGroup addGroup = new AddGroup(); // Замените на логику получения имени группы
+            addGroup.ShowDialog();
+            string groupName = addGroup.GroupName;
 
+            TreeViewItem groupNode = null;
+            foreach (TreeViewItem node in treeView.Items)
+            {
+                if (node.Header.ToString() == groupName)
+                {
+                    groupNode = node;
+                    break;
+                }
+            }
+
+            if (groupNode == null)
+            {
+                // Создание нового узла группы
+                groupNode = new TreeViewItem();
+                groupNode.Header = groupName;
+
+                // Добавление узла группы в TreeView
+                treeView.Items.Add(groupNode);
+            }
+
+            // Проверка наличия группы
+            if (groups.Any(g => g.Name == groupName))
+            {
+                MessageBox.Show("Группа уже существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Создание новой группы и добавление ее в список групп
+            Group newGroup = new Group
+            {
+                Name = groupName,
+                Students = new List<Student>()
+            };
+
+            groups.Add(newGroup);
+
+            // Добавление группы в TreeView и обновление списка чекбоксов
+
+            AddGroupToTreeView(groupName);
+            UpdateCheckBoxList();
         }
 
         private void DeleteGroup_Click(object sender, RoutedEventArgs e)
         {
+            if (treeView.SelectedItem is TreeViewItem selectedItem)
+            {
+                if (selectedItem.Header is string groupName)
+                {
+                    // Поиск группы по имени
+                    Group existingGroup = groups.FirstOrDefault(g => g.Name == groupName);
 
+                    if (existingGroup != null)
+                    {
+                        if (MessageBox.Show("Уверены, что хотите удалить данную группу?", "Подтвердите действие", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                        {
+                            // Удаление группы из списка групп
+                            groups.Remove(existingGroup);
+
+                            // Удаление выбранной группы из TreeView
+                            if (selectedItem.Parent is TreeViewItem parent)
+                            {
+                                parent.Items.Remove(selectedItem);
+                            }
+                            else
+                            {
+                                treeView.Items.Remove(selectedItem);
+                            }
+
+                            // Обновление списка чекбоксов в listBox
+                            UpdateCheckBoxList();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Группа не существует.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
+            }
+        }
+
+        private void SendCommand_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(NotifyMessageBox.Text))
+            {
+                if (MessageBox.Show("Ви впевнені, що хочете надіслати цей текст студентам?", "Підтвердіть дію", MessageBoxButton.YesNo, MessageBoxImage.Information) == MessageBoxResult.Yes)
+                {
+                    SenderMessage = NotifyMessageBox.Text;
+                    MessageBox.Show("Текст було успішно надіслано студентам!", "Успішно", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Текст відсутній, введіть будь ласка текст, який хочете відправити", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
         }
     }
 }
